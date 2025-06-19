@@ -1,3 +1,8 @@
+import os
+import logging
+import requests
+
+
 class PowerDNSProvider:
     def __init__(self):
         self.api_url = os.getenv('PDNS_API_URL')
