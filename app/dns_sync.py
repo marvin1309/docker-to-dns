@@ -31,8 +31,13 @@ def build_dns_name(labels, service_name):
 def process_container(container):
     labels = container.labels
     container_id = container.id
-    ip = container.attrs['NetworkSettings']['IPAddress']
-    logger.info(f"Processing container {container.name} ({container.short_id}) with IP {ip}")
+    host_ip = os.getenv("PDNS_HOST_IP")
+
+    if not host_ip:
+        logger.error("❌ Umgebungsvariable PDNS_HOST_IP fehlt – kann DNS nicht setzen.")
+        return
+
+    logger.info(f"Processing container {container.name} ({container.short_id}) with host IP {host_ip}")
 
     for label in labels:
         if label.startswith("auto-dns.customDNS."):
@@ -44,16 +49,16 @@ def process_container(container):
                     logger.info(f"Replacing old DNS record: {old_dns} → {dns_name}")
                     provider.delete_record(old_dns)
 
-                provider.create_record(dns_name, ip)
-                update_record(container_id, dns_name, ip)
-                logger.info(f"✅ Created DNS record: {dns_name} → {ip}")
+                provider.create_record(dns_name, host_ip)
+                update_record(container_id, dns_name, host_ip)
+                logger.info(f"✅ Created DNS record: {dns_name} → {host_ip}")
 
                 # Optional: Wildcard
                 wildcard = labels.get(f"auto-dns.createWildcard.{service_name}", "false").lower() == "true"
                 if wildcard:
                     wildcard_name = f"*.{dns_name}"
-                    provider.create_record(wildcard_name, ip)
-                    logger.info(f"🌐 Created wildcard DNS: {wildcard_name} → {ip}")
+                    provider.create_record(wildcard_name, host_ip)
+                    logger.info(f"🌐 Created wildcard DNS: {wildcard_name} → {host_ip}")
             except ValueError as e:
                 logger.warning(f"⚠️ Label issue in container '{container.name}': {e}")
             except Exception as e:

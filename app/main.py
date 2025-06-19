@@ -48,6 +48,12 @@ def initial_sync():
 
 if __name__ == "__main__":
     logger.info("🔥 Docker-to-DNS gestartet")
+
+    host_ip = os.getenv("PDNS_HOST_IP")
+    if not host_ip:
+        logger.critical("❌ PDNS_HOST_IP ist nicht gesetzt! Container wird beendet.")
+        exit(1)
+
     init_db()
     initial_sync()
     while True:

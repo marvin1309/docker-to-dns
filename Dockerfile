@@ -17,9 +17,10 @@ RUN mkdir -p /app/data
 ENV DNS_PROVIDER=powerdns \
     PDNS_API_URL=http://localhost:8081/api/v1 \
     PDNS_ZONE=example.com \
+    PDNS_HOST_IP=10.1.130.70 \
     CHECK_INTERVAL=60 \
     DB_PATH=/app/data/dns_records.db \
     PYTHONUNBUFFERED=1
-
+    
 # Startbefehl festlegen
 CMD ["python", "main.py"]
