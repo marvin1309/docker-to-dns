@@ -23,4 +23,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/<your_username>/docker-to-dns:latest
+        tags: ghcr.io/marvin1309/docker-to-dns:latest
