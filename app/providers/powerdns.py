@@ -1,7 +1,3 @@
-import os
-import requests
-import logging
-
 class PowerDNSProvider:
     def __init__(self):
         self.api_url = os.getenv('PDNS_API_URL')
@@ -35,17 +31,26 @@ class PowerDNSProvider:
 
     def delete_record(self, name, record_type="A"):
         headers = {"X-API-Key": self.api_key}
-        data = {
-            "rrsets": [{
-                "name": f"{name}.",
-                "type": record_type,
-                "changetype": "DELETE"
-            }]
-        }
         url = f"{self.api_url}/servers/localhost/zones/{self.zone}"
-        try:
-            response = requests.patch(url, json=data, headers=headers)
-            response.raise_for_status()
-            self.logger.info(f"🗑️ DNS-Eintrag gelöscht: {name}")
-        except requests.RequestException as e:
-            self.logger.warning(f"⚠️ Fehler beim Löschen des DNS-Eintrags '{name}': {e}")
+
+        def send_delete(target_name):
+            data = {
+                "rrsets": [{
+                    "name": f"{target_name}.",
+                    "type": record_type,
+                    "changetype": "DELETE"
+                }]
+            }
+            try:
+                response = requests.patch(url, json=data, headers=headers)
+                response.raise_for_status()
+                self.logger.info(f"🗑️ DNS-Eintrag gelöscht: {target_name}")
+            except requests.RequestException as e:
+                self.logger.warning(f"⚠️ Fehler beim Löschen des DNS-Eintrags '{target_name}': {e}")
+
+        # Normaler Eintrag
+        send_delete(name)
+
+        # Wildcard-Eintrag zusätzlich löschen
+        wildcard_name = f"*.{name}"
+        send_delete(wildcard_name)
