@@ -18,7 +18,8 @@ ENV DNS_PROVIDER=powerdns \
     PDNS_API_URL=http://localhost:8081/api/v1 \
     PDNS_ZONE=example.com \
     CHECK_INTERVAL=60 \
-    DB_PATH=/app/data/dns_records.db
+    DB_PATH=/app/data/dns_records.db \
+    PYTHONUNBUFFERED=1
 
 # Startbefehl festlegen
 CMD ["python", "main.py"]
