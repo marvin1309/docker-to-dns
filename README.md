@@ -66,7 +66,7 @@ Um die DNS-Einträge pro Container zu definieren, nutze folgende Labels im Compo
 📦 Beispiel (`docker-compose.yml`)
 ----------------------------------
 
-```yaml
+``.yml
 services:
   traefik:
     image: traefik:latest
